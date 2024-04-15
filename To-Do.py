@@ -3,6 +3,9 @@ import tkinter as tk
 from tkcalendar import Calendar
 from tkinter import messagebox
 from datetime import datetime
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 # 마감일 선택 함수
 def select_deadline():
@@ -29,6 +32,8 @@ def add_task():
     deadline = deadline_entry.get()  # 입력된 마감일 가져오기
     if task:  # 할 일이 비어 있지 않은 경우에만 추가
         task_with_info = f"{category}: {task} ({priority})" if category else f"{task} ({priority})"  # 카테고리와 우선순위 함께 저장
+        if deadline:  # 마감일이 입력된 경우에만 추가
+            task_with_info += f" - 마감일: {deadline}"  # 마감일을 함께 저장
         listbox.insert(tk.END, task_with_info)  # 리스트 상자에 항목 추가
         entry.delete(0, tk.END)  # 입력 상자 비우기
         deadline_date = datetime.strptime(deadline, "%Y-%m-%d") if deadline else None  # 마감일 문자열을 datetime 객체로 변환
@@ -43,6 +48,38 @@ def delete_task():
     if selected_task_index:  # 선택된 항목이 있을 경우에만 삭제
         listbox.delete(selected_task_index)  # 선택된 항목 삭제
 
+# 이메일 전송 함수
+def send_email(to_email, subject, body):
+    from_email = "your_email@example.com"  # 보내는 이메일 주소
+    password = "your_email_password"  # 보내는 이메일 비밀번호
+
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    server = smtplib.SMTP('smtp.example.com', 587)  # SMTP 서버 정보 입력
+    server.starttls()
+    server.login(from_email, password)
+    text = msg.as_string()
+    server.sendmail(from_email, to_email, text)
+    server.quit()
+
+# 할 일을 공유하는 함수
+def share_task():
+    selected_index = listbox.curselection()  # 선택된 항목의 인덱스 가져오기
+    if selected_index:  # 선택된 항목이 있는 경우에만 실행
+        selected_task = listbox.get(selected_index)  # 선택된 항목 가져오기
+        # 여기서 할 일을 공유하는 코드를 작성하면 됩니다.
+        # 이메일로 공유하는 예제
+        to_email = "recipient@example.com"  # 수신자 이메일 주소
+        subject = "할 일 공유"
+        body = f"할 일: {selected_task}"
+        send_email(to_email, subject, body)
+        messagebox.showinfo("성공", "할 일을 이메일로 공유했습니다!")
+
 # tkinter 윈도우 생성
 window = tk.Tk()
 window.title("To-Do 리스트 앱")
@@ -52,7 +89,7 @@ label = tk.Label(window, text="할 일 목록")
 label.pack()
 
 # 리스트 상자 추가
-listbox = tk.Listbox(window)
+listbox = tk.Listbox(window, width=50)
 listbox.pack()
 
 # 할 일 입력 상자 추가
@@ -111,6 +148,10 @@ button.pack(side=tk.LEFT)
 # 삭제 버튼 추가
 delete_button = tk.Button(window, text="삭제", command=delete_task)
 delete_button.pack(side=tk.RIGHT)
+
+# 공유 버튼 추가
+share_button = tk.Button(window, text="공유", command=share_task)
+share_button.pack()
 
 # 윈도우 실행
 window.mainloop()
