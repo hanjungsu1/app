@@ -1,14 +1,24 @@
 # -*- coding: euc-kr -*-
 import tkinter as tk
+from tkinter import messagebox
+from datetime import datetime
 
 # 할 일을 추가하는 함수
 def add_task():
     task = entry.get()  # 입력된 할 일 가져오기
     category = category_var.get()  # 선택된 카테고리 가져오기
+    repeat = repeat_var.get()  # 반복 주기 가져오기
+    priority = priority_var.get()  # 선택된 우선순위 가져오기
+    deadline = deadline_entry.get()  # 입력된 마감일 가져오기
     if task:  # 할 일이 비어 있지 않은 경우에만 추가
-        task_with_category = f"{category}: {task}" if category else task  # 카테고리와 할 일을 함께 저장
-        listbox.insert(tk.END, task_with_category)  # 리스트 상자에 항목 추가
+        task_with_info = f"{category}: {task} ({priority})" if category else f"{task} ({priority})"  # 카테고리와 우선순위 함께 저장
+        listbox.insert(tk.END, task_with_info)  # 리스트 상자에 항목 추가
         entry.delete(0, tk.END)  # 입력 상자 비우기
+        deadline_date = datetime.strptime(deadline, "%Y-%m-%d") if deadline else None  # 마감일 문자열을 datetime 객체로 변환
+        if deadline_date and deadline_date < datetime.now():  # 마감일이 지난 경우 경고 메시지 표시
+            messagebox.showwarning("마감일 경고", "마감일이 이미 지났습니다!")
+        elif deadline_date and deadline_date.date() == datetime.now().date():  # 오늘 마감일인 경우 알림 표시
+            messagebox.showinfo("마감일 알림", "오늘 마감일이 있는 할 일이 있습니다!")
 
 # 할 일을 삭제하는 함수
 def delete_task():
@@ -43,7 +53,37 @@ category_var.set(categories[0])  # 기본 카테고리 설정
 category_option = tk.OptionMenu(window, category_var, *categories)
 category_option.pack()
 
-# 버튼 추가
+# 반복 주기 레이블 추가
+repeat_label = tk.Label(window, text="반복 주기:")
+repeat_label.pack()
+
+# 반복 주기 옵션 추가
+repeat_options = ["매일", "매주", "매월"]
+repeat_var = tk.StringVar(window)
+repeat_var.set(repeat_options[0])  # 기본 반복 주기 설정
+repeat_option = tk.OptionMenu(window, repeat_var, *repeat_options)
+repeat_option.pack()
+
+# 우선순위 레이블 추가
+priority_label = tk.Label(window, text="우선순위:")
+priority_label.pack()
+
+# 우선순위 옵션 추가
+priorities = ["낮음", "보통", "높음"]
+priority_var = tk.StringVar(window)
+priority_var.set(priorities[1])  # 기본 우선순위 설정
+priority_option = tk.OptionMenu(window, priority_var, *priorities)
+priority_option.pack()
+
+# 마감일 레이블 추가
+deadline_label = tk.Label(window, text="마감일 (옵션, YYYY-MM-DD 형식):")
+deadline_label.pack()
+
+# 마감일 입력 상자 추가
+deadline_entry = tk.Entry(window, width=20)
+deadline_entry.pack()
+
+# 추가 버튼 추가
 button = tk.Button(window, text="추가", command=add_task)
 button.pack(side=tk.LEFT)
 
