@@ -1,16 +1,42 @@
+# -*- coding: euc-kr -*-
 import tkinter as tk
 
-# tkinter ìœˆë„ìš° ìƒì„±
-window = tk.Tk()
-window.title("ê°„ë‹¨í•œ To-Do ë¦¬ìŠ¤íŠ¸ ì•±")
+# ÇÒ ÀÏÀ» Ãß°¡ÇÏ´Â ÇÔ¼ö
+def add_task():
+    task = entry.get()  # ÀÔ·ÂµÈ ÇÒ ÀÏ °¡Á®¿À±â
+    if task:  # ÇÒ ÀÏÀÌ ºñ¾î ÀÖÁö ¾ÊÀº °æ¿ì¿¡¸¸ Ãß°¡
+        listbox.insert(tk.END, task)  # ¸®½ºÆ® »óÀÚ¿¡ Ç×¸ñ Ãß°¡
+        entry.delete(0, tk.END)  # ÀÔ·Â »óÀÚ ºñ¿ì±â
 
-# ë ˆì´ë¸” ì¶”ê°€
-label = tk.Label(window, text="í•  ì¼ ëª©ë¡")
+# ÇÒ ÀÏÀ» »èÁ¦ÇÏ´Â ÇÔ¼ö
+def delete_task():
+    selected_task_index = listbox.curselection()  # ¼±ÅÃµÈ Ç×¸ñÀÇ ÀÎµ¦½º °¡Á®¿À±â
+    if selected_task_index:  # ¼±ÅÃµÈ Ç×¸ñÀÌ ÀÖÀ» °æ¿ì¿¡¸¸ »èÁ¦
+        listbox.delete(selected_task_index)  # ¼±ÅÃµÈ Ç×¸ñ »èÁ¦
+
+# tkinter À©µµ¿ì »ı¼º
+window = tk.Tk()
+window.title("°£´ÜÇÑ To-Do ¸®½ºÆ® ¾Û")
+
+# ·¹ÀÌºí Ãß°¡
+label = tk.Label(window, text="ÇÒ ÀÏ ¸ñ·Ï")
 label.pack()
 
-# ë²„íŠ¼ ì¶”ê°€
-button = tk.Button(window, text="ì¶”ê°€")
-button.pack()
+# ¸®½ºÆ® »óÀÚ Ãß°¡
+listbox = tk.Listbox(window)
+listbox.pack()
 
-# ìœˆë„ìš° ì‹¤í–‰
+# ÇÒ ÀÏ ÀÔ·Â »óÀÚ Ãß°¡
+entry = tk.Entry(window, width=30)
+entry.pack()
+
+# ¹öÆ° Ãß°¡
+button = tk.Button(window, text="Ãß°¡", command=add_task)
+button.pack(side=tk.LEFT)
+
+# »èÁ¦ ¹öÆ° Ãß°¡
+delete_button = tk.Button(window, text="»èÁ¦", command=delete_task)
+delete_button.pack(side=tk.RIGHT)
+
+# À©µµ¿ì ½ÇÇà
 window.mainloop()
