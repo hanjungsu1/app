@@ -1,7 +1,24 @@
 # -*- coding: euc-kr -*-
 import tkinter as tk
+from tkcalendar import Calendar
 from tkinter import messagebox
 from datetime import datetime
+
+# 마감일 선택 함수
+def select_deadline():
+    def set_deadline():
+        selected_date = cal.selection_get()  # 선택한 날짜 가져오기
+        deadline_entry.delete(0, tk.END)  # 이전에 입력된 날짜 지우기
+        deadline_entry.insert(0, selected_date.strftime("%Y-%m-%d"))  # 선택한 날짜를 입력 상자에 넣기
+        top.destroy()  # 캘린더 창 닫기
+
+    top = tk.Toplevel(window)  # 새로운 윈도우 생성
+    cal = Calendar(top, selectmode="day", date_pattern="yyyy-mm-dd")  # 달력 위젯 생성
+    cal.pack()
+
+    # 확인 버튼 추가
+    confirm_button = tk.Button(top, text="확인", command=set_deadline)
+    confirm_button.pack()
 
 # 할 일을 추가하는 함수
 def add_task():
@@ -28,7 +45,7 @@ def delete_task():
 
 # tkinter 윈도우 생성
 window = tk.Tk()
-window.title("간단한 To-Do 리스트 앱")
+window.title("To-Do 리스트 앱")
 
 # 레이블 추가
 label = tk.Label(window, text="할 일 목록")
@@ -76,12 +93,16 @@ priority_option = tk.OptionMenu(window, priority_var, *priorities)
 priority_option.pack()
 
 # 마감일 레이블 추가
-deadline_label = tk.Label(window, text="마감일 (옵션, YYYY-MM-DD 형식):")
+deadline_label = tk.Label(window, text="마감일 (옵션):")
 deadline_label.pack()
 
 # 마감일 입력 상자 추가
 deadline_entry = tk.Entry(window, width=20)
 deadline_entry.pack()
+
+# 마감일 선택 버튼 추가
+select_deadline_button = tk.Button(window, text="마감일 선택", command=select_deadline)
+select_deadline_button.pack()
 
 # 추가 버튼 추가
 button = tk.Button(window, text="추가", command=add_task)
